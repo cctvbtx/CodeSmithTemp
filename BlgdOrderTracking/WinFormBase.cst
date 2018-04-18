@@ -1,0 +1,119 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="C#" ResponseEncoding="utf-8" Description="业务逻辑模型模板"  %>
+<%@ Register Name="Common" Template="Common.cst" MergeProperties="False" ExcludeProperties="" %>
+<%@ Property Name="DB" Type="SchemaExplorer.DatabaseSchema" Default="NGIG_II" Category="Data" Description="数据库对象" %>
+<%@ Property Name="Table" Type="SchemaExplorer.TableSchema" Default="" Optional="False" Category="Data" Description="数据表对象" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="FileName" Type="String" Default="d:\\a.cs" Optional="False" Category="内容" Description="输出的文件路径" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="OutputFile" Type="Boolean" Default="false" Optional="False" Category="内容" Description="是否输出到文件" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="NameSpace" Type="String" Default="BLGD.CRM" Optional="False" Category="内容" Description="命名空间" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="Creater" Type="String" Default="jinchuanliang" Optional="False" Category="内容" Description="创建者" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.IO" %>
+<%
+Common com = new Common();
+string newTableName = Table.Name;//.Remove(0,3);
+string prefix = "";
+%>
+/*----------------------------------------------------------------
+// Copyright (C) 2017 佰林格都信息科技有限公司 版权所有。 
+//
+// 文件名：B<%= prefix + newTableName%>
+// 文件功能描述：提供处理各种管理[<%=Table.Name%>]表<%=Table.Description%>的业务逻辑的方法
+//
+// 创建标识：<%=Creater%> <%=DateTime.Now.ToString("yyyy-MM-dd")%>
+//
+// 修改标识：
+// 修改描述：
+//----------------------------------------------------------------*/
+using System;
+using System.Data.Common;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
+using System.Text;
+
+using <%=NameSpace%>.BLL;
+using <%=NameSpace%>.Entity; 
+using <%=NameSpace%>.Utility; 
+
+namespace <%=NameSpace%>
+{
+    /// <summary>
+    /// 提供处理各种管理<%=Table.Description%>  [<%=Table.Name%>]表的业务逻辑的方法
+    /// </summary>
+	/// <author><%=Creater%> <%=DateTime.Now.ToString("yyyy-MM-dd")%></author>
+    public sealed class Frm<%=prefix + newTableName%>  : Form
+    {        
+		/// <summary>
+        /// 私有的构造函数。
+        /// </summary>
+        private Frm<%=prefix + newTableName%>()
+        {
+        }
+		
+        
+        /// <summary>
+        /// 添加数据
+        /// </summary>
+        /// <returns></returns>      
+        private int Add()
+        { 
+            <%=prefix + newTableName%>Entity mod = new <%=prefix + newTableName%>Entity();
+            <%for(int i = 0;i<Table.Columns.Count;i++)%>
+    		<%{%>
+            <% if(com.GetCSharpDataType(Table.Columns[i])=="int"||com.GetCSharpDataType(Table.Columns[i])=="long"){%>
+            mod.<%=com.ConvertToPascal2(Table.Columns[i].Name)%> = Convert.ToInt32(tbx_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>.Text.Trim());
+            <%}else{ %>
+            mod.<%=com.ConvertToPascal2(Table.Columns[i].Name)%> = tbx_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>.Text.Trim();
+            <%}} %> 
+            
+            
+            return B<%=prefix + newTableName%>.BLL.InsertOrUpdate(mod);
+            
+        }
+        
+        private voie showItem()
+        {
+        
+            <%for(int i = 0;i<Table.Columns.Count;i++)%>
+    		<%{%>             
+            tbx_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>.Text = mod.<%=com.ConvertToPascal2(Table.Columns[i].Name)%> ;
+            <%} %> 
+            
+        }
+        
+           
+        
+        /// <summary>
+        /// 加载数据列表
+        /// </summary>
+        private void loadData()
+        {
+            dgv_<%=prefix + newTableName%>.AutoGenerateColumns = false;
+            List<<%=prefix + newTableName%>Entity> list<%=prefix + newTableName%>Entity = B<%=prefix + newTableName%>.BLL.GetModels();
+            
+            dgv_<%=prefix + newTableName%>.DataSource = listEntity;
+        }      
+      
+		
+    }
+}
+
+<script runat="template">
+///重写呈现方法，输出到文件
+public override void Render(TextWriter writer)
+{	
+	if(OutputFile)
+	{
+		StreamWriter sw = new StreamWriter(FileName,true);
+		this.Response.AddTextWriter(sw);
+		base.Render(writer);
+		sw.Close();
+	}		
+	else
+	{
+		base.Render(writer);
+	}	
+}
+</script>

@@ -1,0 +1,26 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<codeSmith xmlns="http://www.codesmithtools.com/schema/csp.xsd">
+  <variables>
+    <add key="ConnectionString1" value="Data Source=192.168.0.209;Initial Catalog=AccountSystem;Persist Security Info=True;User ID=sa;Password=123456" />
+  </variables>
+  <propertySets>
+    <propertySet name="Model.cs" output="Model.cs" template="Model.cst">
+      <property name="DB">
+        <connectionString>$(ConnectionString1)</connectionString>
+        <providerType>SchemaExplorer.SqlSchemaProvider,SchemaExplorer.SqlSchemaProvider</providerType>
+      </property>
+      <property name="Table">
+        <connectionString>$(ConnectionString1)</connectionString>
+        <providerType>SchemaExplorer.SqlSchemaProvider,SchemaExplorer.SqlSchemaProvider</providerType>
+        <table>
+          <owner>dbo</owner>
+          <name>Contract</name>
+        </table>
+      </property>
+      <property name="FileName">d:\\a.cs</property>
+      <property name="OutputFile">False</property>
+      <property name="NameSpace">AccountSystem.Entity</property>
+      <property name="Creater">jinchuanliang</property>
+    </propertySet>
+  </propertySets>
+</codeSmith>

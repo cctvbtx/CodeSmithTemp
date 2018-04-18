@@ -1,0 +1,232 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="C#" RBLGDonseEncoding="utf-8" Description="数据访问方法型模板"  %>
+<%@ Register Name="Common" Template="Common.cst" MergeProperties="False" ExcludeProperties="" %>
+<%@ Property Name="DB" Type="SchemaExplorer.DatabaseSchema" Default="NGIG_II" Category="Data" Description="数据库对象" %>
+<%@ Property Name="Table" Type="SchemaExplorer.TableSchema" Default="" Optional="False" Category="Data" Description="数据表对象" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="FileName" Type="String" Default="d:\\a.cs" Optional="False" Category="内容" Description="输出的文件路径" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="OutputFile" Type="Boolean" Default="false" Optional="False" Category="内容" Description="是否输出到文件" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="NamBLGDace" Type="String" Default="BLGD.OrderTracking" Optional="False" Category="内容" Description="命名空间" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="Creater" Type="String" Default="jinchuanliang" Optional="False" Category="内容" Description="创建者" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Assembly Name="SchemaExplorer" %>  
+<%@ Assembly Name="System.Data" %>
+<%@ Assembly Name="System.IO" %> 
+<%@ Import Namespace="System.IO" %>
+<%
+Common com = new Common();
+string newTableName = Table.Name;//.Remove(0,3);
+string prefix = "";
+string sqlFistBase=""; 
+string sqlFist=","; 
+%>
+/*----------------------------------------------------------------
+// Copyright (C) 2017 佰林格都信息科技有限公司 版权所有。 
+//
+// 文件名：D<%= prefix + com.ConvertToPascal(newTableName)%>
+// 文件功能描述：<%=Table.Description%> 提供处理各种管理[<%=Table.Name%>]表的数据访问方法
+//
+// 创建标识：<%=Creater%> <%=DateTime.Now.ToString("yyyy-MM-dd")%>
+//
+// 修改标识：
+// 修改描述：
+//----------------------------------------------------------------*/
+using System;
+using System.Data;
+using System.Data.Common;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using BLGD.DataAccess;
+using BLGD.Entity;
+using <%=NamBLGDace%>.Entity;  
+
+namespace <%=NamBLGDace%>.DAL
+{
+    /// <summary>
+    /// 提供处理各种管理<%=Table.Description%>  [<%=Table.Name%>]表的数据访问方法
+    /// </summary>
+	/// <author><%=Creater%> <%=DateTime.Now.ToString("yyyy-MM-dd")%></author>
+    public class D<%=prefix + newTableName%>  
+    {
+		/// <summary>
+        /// CRUD实体操作对象
+        /// </summary>
+        internal readonly static EntityCRUD<<%=prefix + newTableName%>Entity> Crud = new EntityCRUD<<%=prefix + newTableName%>Entity>();
+ 
+         /// <summary>
+        /// 是否已存在此对应数据
+        /// </summary>
+        /// <param name="name"></param>
+        /// <param name="userId"></param>
+        /// <returns></returns>
+        public bool IsExists(string name)
+        {
+            string sql = "select id from <%=Table.Name%> with(nolock) where Content=@name ";
+            List<DbParameter> plist = new List<DbParameter>(); 
+            plist.Add(new SqlParameter("@name", name));
+            object obj = SqlHelper.ExecuteValue(sql,CommandType.Text, plist);
+
+            if (obj != null && Convert.ToInt32(obj) > 0)
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+
+        }
+    
+		/// <summary>
+        /// 添加<%=com.ConvertToCamel(Table.Name)%>数据 纯SQL操作
+        /// </summary>
+        /// <param name="model">数据实体</param> 
+        /// 创建人：<%=Creater%> 时间：<%=DateTime.Now.ToString("yyyy-MM-dd")%>
+        /// <returns></returns>
+        public int Insert(<%=prefix + newTableName%>Entity model)
+        {
+            string sql = @"
+            INSERT INTO <%=Table.Name%>(<%for(int i = 0;i<Table.Columns.Count;i++){%><%=(i>0?sqlFist:sqlFistBase)%><%=(Table.Columns[i].Name)%><%}%>)
+            VALUES (<%for(int i = 0;i<Table.Columns.Count;i++){%><%=(i>0?sqlFist:sqlFistBase)%>@<%=Table.Columns[i].Name.ToLower()%><%}%>)
+            select @@identity
+            ";
+            List<DbParameter> p = new List<DbParameter>();
+            <%for(int i = 0;i<Table.Columns.Count;i++){%>
+            p.Add(new SqlParameter("@<%=Table.Columns[i].Name.ToLower()%>", model.<%=com.ConvertToPascal2(Table.Columns[i].Name)%>));
+            <%}%>
+            
+            object i = SqlHelper.ExecuteValue(sql,CommandType.Text, p);
+            return  Convert.ToInt32(i) ;
+        }
+     
+		/// <summary>
+        /// 添加或更新<%=com.ConvertToCamel(Table.Name)%>数据 纯SQL操作
+        /// </summary>
+        /// <param name="model">数据实体</param> 
+        /// 创建人：<%=Creater%> 时间：<%=DateTime.Now.ToString("yyyy-MM-dd")%>
+        /// <returns></returns>
+        public int InsertOrUpdate(<%=prefix + newTableName%>Entity model)
+        {
+            string sql = @"
+    IF not EXISTS (select id from <%=Table.Name%> with(nolock) where Content=@name ) 
+    begin
+            INSERT INTO <%=Table.Name%>(<%for(int i = 0;i<Table.Columns.Count;i++){%><%=(i>0?sqlFist:sqlFistBase)%><%=Table.Columns[i].Name%><%}%>)
+            VALUES (<%for(int i = 0;i<Table.Columns.Count;i++){%><%=(i>0?sqlFist:sqlFistBase)%>@<%=Table.Columns[i].Name.ToLower()%><%}%>)
+            select @@identity
+             end     
+    else
+    begin 
+            UPDATE <%=Table.Name%> SET <%for(int i = 0;i<Table.Columns.Count;i++){%><%=(i>0?sqlFist:sqlFistBase)%><%=Table.Columns[i].Name%>=@<%=Table.Columns[i].Name.ToLower()%><%}%>            
+             where id =@id
+             select id from <%=Table.Name%> with(nolock) where EXID=@exid and UGID=@ugid
+    end     
+            ";
+            List<DbParameter> p = new List<DbParameter>();
+            <%for(int i = 0;i<Table.Columns.Count;i++){%>
+            p.Add(new SqlParameter("@<%=Table.Columns[i].Name.ToLower()%>", model.<%=com.ConvertToPascal2(Table.Columns[i].Name)%>));
+            <%}%>
+            
+            object i = SqlHelper.ExecuteValue(sql,CommandType.Text, p);
+            return  Convert.ToInt32(i) ;
+        }
+    
+		 
+		/// <summary>
+        /// 更新表信息<%=com.ConvertToCamel(Table.Name)%>数据 纯SQL操作
+        /// </summary>
+        /// <param name="model">数据实体</param> 
+        /// 创建人：<%=Creater%> 时间：<%=DateTime.Now.ToString("yyyy-MM-dd")%>
+        /// <returns></returns>
+        public bool Update(<%=prefix + newTableName%>Entity model)
+        {
+            string sql = @"
+            UPDATE <%=Table.Name%> SET <%for(int i = 0;i<Table.Columns.Count;i++){%><%=(i>0?sqlFist:sqlFistBase)%><%=Table.Columns[i].Name%>=@<%=Table.Columns[i].Name.ToLower()%><%}%>            
+             where id =@id";
+            List<SqlParameter> p = new List<SqlParameter>();
+            <%for(int i = 0;i<Table.Columns.Count;i++){%>
+            p.Add(new SqlParameter("@<%=Table.Columns[i].Name.ToLower()%>", model.<%=com.ConvertToPascal2(Table.Columns[i].Name)%>));
+            <%}%>
+            
+            return SqlHelper.ExecuteSql(sql, p) > 0; 			
+        
+        }
+        
+		/// <summary>
+        /// 更新表信息<%=com.ConvertToCamel(Table.Name)%>数据 纯SQL操作
+        /// </summary>
+        /// <param name="model">数据实体</param> 
+        /// 创建人：<%=Creater%> 时间：<%=DateTime.Now.ToString("yyyy-MM-dd")%>
+        /// <returns></returns>
+        public bool Update(string fileVal,string file,string strWhere)
+        {
+            string sql = @"
+            UPDATE <%=Table.Name%> SET " + file + " = "+fileVal+" where "+strWhere; 
+             
+            return SqlHelper.ExecuteSql(sql, null) > 0;
+        }
+		
+		/// <summary>
+        /// 标记删除<%=com.ConvertToCamel(Table.Name)%>数据
+        /// </summary>
+        /// <%= "<param name=\"" + com.ConvertToParameters(Table.Columns[0].Name) + "\""%>><%=Table.Columns[0].Description%></param>
+        /// <param name="userId">操作人ID</param>
+        /// 创建人：<%=Creater%> 时间：<%=DateTime.Now.ToString("yyyy-MM-dd")%>
+        /// <returns></returns>
+		public bool SignDelete(int id, int userId)
+        {
+			string sql = "update <%=Table.Name%> set isdelete=1  where id=@id and userid=@userId ";
+
+            List<SqlParameter> plist = new List<SqlParameter>();
+            plist.Add(new SqlParameter("@id", id));
+            plist.Add(new SqlParameter("@userId", userId));
+
+            int i = SqlHelper.ExecuteSql(sql, plist);
+
+            return i > 0 ? true : false;          
+        }
+		 	 
+        
+        /// <summary>
+        ///  获取ModelList
+        /// </summary> 
+        /// <param name="exid"></param>
+        /// <returns></returns>
+        public List<<%=prefix + newTableName%>Entity> GetModels(int exid)
+        {
+            const string sql = @"
+            SELECT <%for(int i = 0;i<Table.Columns.Count;i++){%><%=(i>0?sqlFist:sqlFistBase)%><%=Table.Columns[i].Name%><%}%> 
+            FROM <%=Table.Name%> with(nolock) 
+            where crm_h_report_num=@crm_h_report_num ";
+
+            List<DbParameter> p = new List<DbParameter>();
+            p.Add(new SqlParameter("@exid", exid));
+
+            DataTable dt = SqlHelper.ExecuteDt(sql, CommandType.Text, p);
+
+            if (dt != null && dt.Rows.Count > 0)
+            {
+                return EntityAux.ConvertDataSetToList<<%=prefix + newTableName%>Entity>(dt);
+            }
+            else
+            {
+                return null;
+            }
+        }
+	}
+}
+
+<script runat="template">
+///重写呈现方法，输出到文件
+public override void Render(TextWriter writer)
+{	
+	if(OutputFile)
+	{
+		StreamWriter sw = new StreamWriter(FileName,true);
+		this.Response.AddTextWriter(sw);
+		base.Render(writer);
+		sw.Close();
+	}		
+	else
+	{
+		base.Render(writer);
+	}	
+}
+</script>

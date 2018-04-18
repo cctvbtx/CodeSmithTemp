@@ -1,0 +1,166 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="C#" ResponseEncoding="utf-8" Description="业务逻辑模型模板"  %>
+<%@ Register Name="Common" Template="Common.cst" MergeProperties="False" ExcludeProperties="" %>
+<%@ Property Name="DB" Type="SchemaExplorer.DatabaseSchema" Default="NGIG_II" Category="Data" Description="数据库对象" %>
+<%@ Property Name="Table" Type="SchemaExplorer.TableSchema" Default="" Optional="False" Category="Data" Description="数据表对象" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="FileName" Type="String" Default="d:\\a.cs" Optional="False" Category="内容" Description="输出的文件路径" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="OutputFile" Type="Boolean" Default="false" Optional="False" Category="内容" Description="是否输出到文件" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="NameSpace" Type="String" Default="Antonio" Optional="False" Category="内容" Description="命名空间" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="Creater" Type="String" Default="jinchuanliang" Optional="False" Category="内容" Description="创建者" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.IO" %>
+<%
+Common com = new Common();
+string newTableName = Table.Name;//.Remove(0,3);
+string prefix = "";
+%>
+/*----------------------------------------------------------------
+// Copyright (C) 2017 佰林格都信息科技有限公司 版权所有。 
+//
+// 文件名：B<%= prefix + newTableName%>
+// 文件功能描述：提供处理各种管理[<%=Table.Name%>]表<%=Table.Description%>的业务逻辑的方法
+//
+// 创建标识：<%=Creater%> <%=DateTime.Now.ToString("yyyy-MM-dd")%>
+//
+// 修改标识：
+// 修改描述：
+//----------------------------------------------------------------*/
+using System;
+using System.Data.Common;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Linq;
+using System.Text;
+
+using <%=NameSpace%>.DAL;
+using <%=NameSpace%>.Entity; 
+using <%=NameSpace%>.Tool; 
+
+namespace <%=NameSpace%>.BLL
+{
+    /// <summary>
+    /// 提供处理各种管理<%=Table.Description%>  [<%=Table.Name%>]表的业务逻辑的方法
+    /// </summary>
+	/// <author><%=Creater%> <%=DateTime.Now.ToString("yyyy-MM-dd")%></author>
+    public sealed class B<%=prefix + newTableName%> 
+    {        
+		/// <summary>
+        /// 私有的构造函数。
+        /// </summary>
+        private B<%=prefix + newTableName%>()
+        {
+        }
+		
+		/// <summary>
+        /// 公共的入口。
+        /// </summary>
+        /// <returns></returns>
+        public static B<%=prefix + newTableName%> BLL
+        {
+            get { return Bll; }
+        }
+		
+		/// <summary>
+        /// 业务逻辑层对象
+        /// </summary>
+        private readonly static B<%=prefix + newTableName%> Bll = new B<%=prefix + newTableName%>();
+		
+		/// <summary>
+        /// 数据访问层对象
+        /// </summary>
+        internal readonly static D<%=prefix + newTableName%> Dal = new D<%=prefix + newTableName%>();
+		
+        
+        /// <summary>
+        /// 添加tb_synctolocalticket数据
+        /// </summary>
+        /// <param name="model">数据实体</param> 
+        /// 创建人：jinchuanliang 时间：2016-09-22
+        /// <returns></returns>
+        public int Insert(<%=prefix + newTableName%>Entity model)
+        {
+            return Dal.Insert(GetSafetyModel(model));
+        }
+         
+		
+		/// <summary>
+        /// 修改<%=com.ConvertToCamel(Table.Name)%>数据
+        /// </summary>
+        /// <param name="model">数据实体</param> 
+        /// 创建人：<%=Creater%> 时间：<%=DateTime.Now.ToString("yyyy-MM-dd")%>
+        /// <returns></returns>
+        public bool Update(<%=prefix + newTableName%>Entity model )
+        {
+            return Dal.Update(GetSafetyModel(model));
+        }
+		
+		/// <summary>
+        /// 删除<%=com.ConvertToCamel(Table.Name)%>数据
+        /// </summary>
+        /// <%= "<param name=\"" + com.ConvertToParameters(Table.Columns[0].Name) + "\""%>><%=Table.Columns[0].Description%></param>
+        /// <param name="userId">操作人ID</param>
+        /// 创建人：<%=Creater%> 时间：<%=DateTime.Now.ToString("yyyy-MM-dd")%>
+        /// <returns></returns>
+		public bool SignDelete(int id, int userId)
+        {
+            return Dal.SignDelete(id, userId);
+        }
+		 
+         
+     
+        
+        /// <summary>
+        ///  获取ModelList
+        /// </summary> 
+        /// <param name="exid"></param>
+        /// <returns></returns>
+        public List<<%=prefix + newTableName%>Entity> GetModels(int exid)
+        {
+            return Dal.GetModels(exid);
+        }
+        
+        
+        /// <summary>
+        /// //安全过虑
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
+        private static <%=prefix + newTableName%>Entity GetSafetyModel(<%=prefix + newTableName%>Entity model)
+        {
+           return model;
+         
+            <%=prefix + newTableName%>Entity mod = new <%=prefix + newTableName%>Entity();
+            <%for(int i = 0;i<Table.Columns.Count;i++)%>
+    		<%{%>
+                <% if(com.GetCSharpDataType(Table.Columns[i])=="string"){%>
+            mod.<%=com.ConvertToPascal2(Table.Columns[i].Name)%> = XSSTool.Filter(model.<%=com.ConvertToPascal2(Table.Columns[i].Name)%>);
+                <%}else{ %>
+            mod.<%=com.ConvertToPascal2(Table.Columns[i].Name)%> =  model.<%=com.ConvertToPascal2(Table.Columns[i].Name)%>;
+            <%}} %> 
+            
+            return mod;
+             
+        }
+
+		
+    }
+}
+
+<script runat="template">
+///重写呈现方法，输出到文件
+public override void Render(TextWriter writer)
+{	
+	if(OutputFile)
+	{
+		StreamWriter sw = new StreamWriter(FileName,true);
+		this.Response.AddTextWriter(sw);
+		base.Render(writer);
+		sw.Close();
+	}		
+	else
+	{
+		base.Render(writer);
+	}	
+}
+</script>

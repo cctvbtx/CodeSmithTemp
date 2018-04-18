@@ -1,0 +1,34 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="C#" ResponseEncoding="utf-8" Description="接口集合模板"  %>
+<%@ Register Name="Common" Template="Common.cst" MergeProperties="False" ExcludeProperties="" %>
+<%@ Register Name="OracleDAL" Template="OracleDAL.cst" MergeProperties="False" ExcludeProperties="" %>
+<%@ Property Name="DB" Type="SchemaExplorer.DatabaseSchema" Default="DB_NGIG_F" Category="Data" Description="数据库对象" %>
+<%@ Property Name="Tables" Type="SchemaExplorer.TableSchemaCollection" Default="" Optional="False" Category="Data" Description="数据表集合对象" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="Directory" Type="String" Default="F:\\NGIG Client\" Optional="False" Category="内容" Description="输出的文件夹" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="OutputFile" Type="Boolean" Default="True" Optional="True" Category="内容" Description="是否输出到文件" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="NameSpace" Type="String" Default="NGIG" Optional="False" Category="内容" Description="命名空间" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="Creater" Type="String" Default="申申" Optional="False" Category="内容" Description="创建者" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.IO" %>
+<%@ Import Namespace="System.Collections" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%
+Common com = new Common();
+%>
+<%
+foreach(TableSchema t in Tables)
+{	
+	OracleDAL b = new OracleDAL();	
+	b.DB=DB;	
+	b.Table = t;
+	b.NameSpace = NameSpace;
+	b.Creater = Creater;
+	b.OutputFile = OutputFile;	
+	b.FileName = Directory + "D" + t.Name.Remove(0,3) + ".cs";
+	b.Render(this.Response);
+}
+%>
+<script runat="template">
+
+</script>

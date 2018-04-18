@@ -1,0 +1,144 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="C#" ResponseEncoding="utf-8" Description="业务逻辑模型模板"  %>
+<%@ Register Name="Common" Template="Common.cst" MergeProperties="False" ExcludeProperties="" %>
+<%@ Property Name="DB" Type="SchemaExplorer.DatabaseSchema" Default="NGIG_II" Category="Data" Description="数据库对象" %>
+<%@ Property Name="Table" Type="SchemaExplorer.TableSchema" Default="" Optional="False" Category="Data" Description="数据表对象" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="FileName" Type="String" Default="d:\\a.cs" Optional="False" Category="内容" Description="输出的文件路径" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="OutputFile" Type="Boolean" Default="false" Optional="False" Category="内容" Description="是否输出到文件" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="NameSpace" Type="String" Default="BLGD.CRM" Optional="False" Category="内容" Description="命名空间" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="Creater" Type="String" Default="jinchuanliang" Optional="False" Category="内容" Description="创建者" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.IO" %>
+<%
+Common com = new Common();
+string newTableName = Table.Name;//.Remove(0,3);
+string prefix = "";
+%>
+  
+namespace <%=NameSpace%>.Frm
+{ 
+    
+    partial class Frm<%=prefix + newTableName%>
+    {
+        /// <summary>
+        /// Required designer variable.
+        /// </summary>
+        private System.ComponentModel.IContainer components = null;
+
+        /// <summary>
+        /// Clean up any resources being used.
+        /// </summary>
+        /// <param name="disposing">true if managed resources should be disposed; otherwise, false.</param>
+        protected override void Dispose(bool disposing)
+        {
+            if (disposing && (components != null))
+            {
+                components.Dispose();
+            }
+            base.Dispose(disposing);
+        }
+
+        #region Windows Form Designer generated code
+
+        /// <summary>
+        /// Required method for Designer support - do not modify
+        /// the contents of this method with the code editor.
+        /// </summary>
+        private void InitializeComponent()
+        {
+                    
+            this.btn_Save = new System.Windows.Forms.Button();
+            
+        <%for(int i = 0;i<Table.Columns.Count;i++)%>
+		<%{%>
+			this.lbl_<%=com.ConvertToPascal2(Table.Columns[i].Name)%> = new System.Windows.Forms.Label();
+            this.tbx_<%=com.ConvertToPascal2(Table.Columns[i].Name)%> = new System.Windows.Forms.TextBox();
+		<%}%>
+            
+            this.SuspendLayout();
+            
+             // 
+            // button1
+            // 
+            this.btn_Save.Location = new System.Drawing.Point(48, 12);
+            this.btn_Save.Name = "btn_Save";
+            this.btn_Save.Size = new System.Drawing.Size(75, 23);
+            this.btn_Save.TabIndex = 0;
+            this.btn_Save.Text = "保存";
+            this.btn_Save.UseVisualStyleBackColor = true;
+             
+             
+        <%for(int i = 0, j=0;i<Table.Columns.Count;i++)%>
+		<%{%> 
+             // 
+            // lbl_<%=com.ConvertToPascal2(Table.Columns[i].Name)%> <%=Table.Columns[i].Description%>
+            // 
+            this.lbl_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>.AutoSize = true;
+            this.lbl_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>.Location = new System.Drawing.Point(50, <%=49+(i*30)%>);
+            this.lbl_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>.Name = "tbx_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>";
+            this.lbl_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>.Size = new System.Drawing.Size(50, 12);
+            this.lbl_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>.TabIndex = <%=j++%>;
+            this.lbl_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>.Text = "<%=Table.Columns[i].Description%>:";
+            // 
+            // tbx_<%=com.ConvertToPascal2(Table.Columns[i].Name)%> <%=Table.Columns[i].Description%>
+            // 
+            this.tbx_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>.Location = new System.Drawing.Point(184, <%=46+(i*30)%>);
+            this.tbx_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>.Name = "tbx_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>";
+            this.tbx_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>.Size = new System.Drawing.Size(215, 30);
+            this.tbx_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>.TabIndex = <%=j++%>;
+            
+		<%}%>
+            
+            // 
+            // FrmSetReminder
+            // 
+            this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
+            this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
+            this.ClientSize = new System.Drawing.Size(758, 338);
+            this.Controls.Add(this.btn_Save);
+                        
+        <%for(int i = 0;i<Table.Columns.Count;i++)%>
+		<%{%>
+            this.Controls.Add(this.lbl_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>);
+            this.Controls.Add(this.tbx_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>); 
+		<%}%>
+            
+            this.Name = "Frm<%=prefix + newTableName%>";
+            this.Text = "<%=Table.Description%>";
+            this.ResumeLayout(false);
+
+        }
+
+        #endregion
+                
+        private System.Windows.Forms.Button btn_Save;
+                 
+        <%for(int i = 0;i<Table.Columns.Count;i++)%>
+		<%{%>
+			private System.Windows.Forms.Label  lbl_<%=com.ConvertToPascal2(Table.Columns[i].Name)%> ;
+            private System.Windows.Forms.TextBox tbx_<%=com.ConvertToPascal2(Table.Columns[i].Name)%>  ;
+		<%}%>
+        
+    }
+    
+    
+}
+
+<script runat="template">
+///重写呈现方法，输出到文件
+public override void Render(TextWriter writer)
+{	
+	if(OutputFile)
+	{
+		StreamWriter sw = new StreamWriter(FileName,true);
+		this.Response.AddTextWriter(sw);
+		base.Render(writer);
+		sw.Close();
+	}		
+	else
+	{
+		base.Render(writer);
+	}	
+}
+</script>

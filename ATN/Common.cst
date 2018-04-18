@@ -1,0 +1,504 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="C#"  ResponseEncoding="utf-8" Src="" Inherits="" Debug="False" Description="公共基类" %>
+<%@ Property Name="Prefix" Type="String" Default="" Optional="True" Category="内容" Description="转换成Pascal或camel写法时添加的前缀" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Text" %>
+<script runat="template">
+
+///根据数据类型获得不属于默认值
+public string GetParityDataType(ColumnSchema col)
+{
+	switch(col.DataType)
+	{
+		case DbType.AnsiString:
+			return "!string.IsNullOrEmpty("+ConvertToCamel(col.Name)+")";
+		case DbType.AnsiStringFixedLength:
+			return "!string.IsNullOrEmpty("+ConvertToCamel(col.Name)+")";
+		case DbType.Binary:
+			return "byte[]";
+		case DbType.Boolean:
+			return ""+ConvertToCamel(col.Name)+" == true || "+ConvertToCamel(col.Name)+" == false";
+		case DbType.Byte:
+			return "byte";
+		case DbType.Currency:
+			return ""+ConvertToCamel(col.Name)+" != -1";
+		case DbType.Date:
+			return ""+ConvertToCamel(col.Name)+" != DateTime.MinValue";
+		case DbType.DateTime:
+			return ""+ConvertToCamel(col.Name)+" != DateTime.MinValue";
+		case DbType.DateTime2:
+			return ""+ConvertToCamel(col.Name)+" != DateTime.MinValue";
+		case DbType.DateTimeOffset:
+			return ""+ConvertToCamel(col.Name)+" != DateTime.MinValue";
+		case DbType.Decimal:
+			if(col.Scale > 0)
+			{
+				return ""+ConvertToCamel(col.Name)+" != -1";
+			}
+			else
+			{
+				if(col.Precision > 10)
+				{
+					return ""+ConvertToCamel(col.Name)+" != -1";
+				}
+				else
+				{
+					return ""+ConvertToCamel(col.Name)+" != -1";
+				}
+			}
+		case DbType.Double:
+			return ""+ConvertToCamel(col.Name)+" != -1";
+		case DbType.Int16:
+			return ""+ConvertToCamel(col.Name)+" != -1";
+		case DbType.Int32:
+			return ""+ConvertToCamel(col.Name)+" != -1";
+		case DbType.Int64:
+			return ""+ConvertToCamel(col.Name)+" != -1";
+		case DbType.Object:
+			return ""+ConvertToCamel(col.Name)+" != null";
+		case DbType.SByte:
+			return "sbyte";
+		case DbType.Single:
+			return ""+ConvertToCamel(col.Name)+" != -1";
+		case DbType.String:
+			return "!string.IsNullOrEmpty("+ConvertToCamel(col.Name)+")";
+		case DbType.StringFixedLength:
+			return "!string.IsNullOrEmpty("+ConvertToCamel(col.Name)+")";
+		case DbType.Time:
+			return "TimeSpan";
+		case DbType.UInt16:
+			return ""+ConvertToCamel(col.Name)+" != ushort.MinValue";
+		case DbType.UInt32:
+			return ""+ConvertToCamel(col.Name)+" != uint.MinValue";
+		case DbType.UInt64:
+			return ""+ConvertToCamel(col.Name)+" != ulong.MinValue";
+		case DbType.VarNumeric:
+			if(col.Scale > 0)
+			{
+				return ""+ConvertToCamel(col.Name)+" != -1";
+			}
+			else
+			{
+				if(col.Precision > 10)
+				{
+					return ""+ConvertToCamel(col.Name)+" != -1";
+				}
+				else
+				{
+					return ""+ConvertToCamel(col.Name)+" != -1";
+				}
+			}
+		case DbType.Xml:
+			return "!string.IsNullOrEmpty("+ConvertToCamel(col.Name)+")";
+		case DbType.Guid:
+			return ""+ConvertToCamel(col.Name)+" != Guid.Empty";
+		default:
+			return "unknown " + col.NativeType;		
+	}
+}
+
+///根据数据类型获得默认值
+public string GetAfferentDataType(ColumnSchema col)
+{
+	switch(col.DataType)
+	{
+		case DbType.AnsiString:
+			return ""+ConvertToCamel(col.Name)+" = null";
+		case DbType.AnsiStringFixedLength:
+			return ""+ConvertToCamel(col.Name)+" = null";
+		case DbType.Binary:
+			return "byte[]";
+		case DbType.Boolean:
+			return ""+ConvertToCamel(col.Name)+" = false";
+		case DbType.Byte:
+			return "byte";
+		case DbType.Currency:
+			return ""+ConvertToCamel(col.Name)+" = -1";
+		case DbType.Date:
+			return ""+ConvertToCamel(col.Name)+" = new DateTime()";
+		case DbType.DateTime:
+			return ""+ConvertToCamel(col.Name)+" = new DateTime()";
+		case DbType.DateTime2:
+			return ""+ConvertToCamel(col.Name)+" = new DateTime()";
+		case DbType.DateTimeOffset:
+			return ""+ConvertToCamel(col.Name)+" = new DateTime()";
+		case DbType.Decimal:
+			if(col.Scale > 0)
+			{
+				return ""+ConvertToCamel(col.Name)+" = -1";
+			}
+			else
+			{
+				if(col.Precision > 10)
+				{
+					return ""+ConvertToCamel(col.Name)+" = -1";
+				}
+				else
+				{
+					return ""+ConvertToCamel(col.Name)+" = -1";
+				}
+			}
+		case DbType.Double:
+			return ""+ConvertToCamel(col.Name)+" = -1";
+		case DbType.Guid:
+			return "Guid";
+		case DbType.Int16:
+			return ""+ConvertToCamel(col.Name)+" = -1";
+		case DbType.Int32:
+			return ""+ConvertToCamel(col.Name)+" = -1";
+		case DbType.Int64:
+			return ""+ConvertToCamel(col.Name)+" = -1";
+		case DbType.Object:
+			return ""+ConvertToCamel(col.Name)+" = null";
+		case DbType.SByte:
+			return "sbyte";
+		case DbType.Single:
+			return ""+ConvertToCamel(col.Name)+" = -1";
+		case DbType.String:
+			return ""+ConvertToCamel(col.Name)+" = null";
+		case DbType.StringFixedLength:
+			return ""+ConvertToCamel(col.Name)+" = null";
+		case DbType.Time:
+			return "TimeSpan";
+		case DbType.UInt16:
+			return ""+ConvertToCamel(col.Name)+" = ushort.MinValue";
+		case DbType.UInt32:
+			return ""+ConvertToCamel(col.Name)+" = uint.MinValue";
+		case DbType.UInt64:
+			return ""+ConvertToCamel(col.Name)+" = ulong.MinValue";
+		case DbType.VarNumeric:
+			if(col.Scale > 0)
+			{
+				return ""+ConvertToCamel(col.Name)+" = -1";
+			}
+			else
+			{
+				if(col.Precision > 10)
+				{
+					return ""+ConvertToCamel(col.Name)+" = -1";
+				}
+				else
+				{
+					return ""+ConvertToCamel(col.Name)+" = -1";
+				}
+			}
+		case DbType.Xml:
+			return ""+ConvertToCamel(col.Name)+" = null";
+		default:
+			return "unknown " + col.NativeType;		
+	}
+}
+
+///根据数据类型设置默认值
+public string SetDataTypeDefaultValue(DbType type)
+{
+	switch(type)
+	{
+		case DbType.AnsiString:
+			return "\"\"";
+		case DbType.AnsiStringFixedLength:
+			return "\"\"";
+		case DbType.Binary:
+			return "0";
+		case DbType.Boolean:
+			return "false";
+		case DbType.Byte:
+			return "0";
+		case DbType.Currency:
+			return "0";
+		case DbType.Date:
+			return "DateTime.Now";
+		case DbType.DateTime:
+			return "DateTime.Now";
+		case DbType.DateTime2:
+			return "DateTime.Now";
+		case DbType.DateTimeOffset:
+			return "DateTime.Now";
+		case DbType.Decimal:
+			return "0";
+		case DbType.Double:
+			return "0";
+		case DbType.Guid:
+			return "Guid.NewGuid()";
+		case DbType.Int16:
+			return "0";
+		case DbType.Int32:
+			return "0";
+		case DbType.Int64:
+			return "0";
+		case DbType.Object:
+			return "\"\"";
+		case DbType.SByte:
+			return "0";
+		case DbType.Single:
+			return "0";
+		case DbType.String:
+			return "\"\"";
+		case DbType.StringFixedLength:
+			return "\"\"";
+		case DbType.Time:
+			return "DateTime.Now";
+		case DbType.UInt16:
+			return "0";
+		case DbType.UInt32:
+			return "0";
+		case DbType.UInt64:
+			return "0";
+		case DbType.VarNumeric:
+			return "0";
+		case DbType.Xml:
+			return "\"\"";
+		default:
+			return "\"\"";
+			
+	}
+}
+
+///将DB数据类型转换为C#
+public string GetCSharpDataType(ColumnSchema col)
+{	
+	switch(col.DataType)
+	{
+		case DbType.AnsiString:
+			return "string";
+		case DbType.AnsiStringFixedLength:
+			return "string";
+		case DbType.Binary:
+			return "byte[]";
+		case DbType.Boolean:
+			return "bool";
+		case DbType.Byte:
+			return "byte";
+		case DbType.Currency:
+			return "decimal";
+		case DbType.Date:
+			return "DateTime";
+		case DbType.DateTime:
+			return "DateTime";
+		case DbType.DateTime2:
+			return "DateTime";
+		case DbType.DateTimeOffset:
+			return "DateTime";
+		case DbType.Decimal:
+			return "decimal";
+		case DbType.Double:
+			return "double";
+		case DbType.Guid:
+			return "Guid";
+		case DbType.Int16:
+			return "short";
+		case DbType.Int32:
+			return "int";
+		case DbType.Int64:
+			return "long";
+		case DbType.Object:
+			return "object";
+		case DbType.SByte:
+			return "sbyte";
+		case DbType.Single:
+			return "float";
+		case DbType.String:
+			return "string";
+		case DbType.StringFixedLength:
+			return "string";
+		case DbType.Time:
+			return "TimeSpan";
+		case DbType.UInt16:
+			return "ushort";
+		case DbType.UInt32:
+			return "uint";
+		case DbType.UInt64:
+			return "ulong";
+		case DbType.VarNumeric:
+			if(col.Scale > 0)
+			{
+				return "decimal";
+			}
+			else
+			{
+				if(col.Precision > 10)
+				{
+					return "long";
+				}
+				else
+				{
+					return "int";
+				}
+			}
+		case DbType.Xml:
+			return "string";
+		default:
+			return "unknown " + col.NativeType;
+			
+	}
+}
+
+//转换为Pascal写法
+public string ConvertToPascal(string name)
+{
+	name = name.ToLower();	
+	return Prefix + ConvertToWord(name.Substring(0,1).ToUpper() + name.Substring(1));
+}
+
+//转换为Pascal写法
+public string ConvertToPascal2(string name)
+{
+	 return name;
+}
+
+//转换为Pascal写法
+public string ConvertToPascal(string name,string firstName)
+{	
+	string firstWord = "";
+	string secondWord= "";
+	name = name.ToLower();
+	firstName =  firstName.ToLower();	
+	
+	if(name == firstName )
+	{
+		firstWord = firstName.Substring(0,1).ToUpper() + firstName.Substring(1);
+		return Prefix + ConvertToWord(firstWord);
+	}
+	
+	if(name.IndexOf(firstName) != -1)
+	{
+		firstWord = firstName.Substring(0,1).ToUpper() + firstName.Substring(1);
+		secondWord = name.Substring(firstName.Length,1).ToUpper() + name.Substring(firstName.Length + 1);
+		return Prefix + ConvertToWord(firstWord + secondWord);
+	}
+	
+	if(name != firstName)
+	{
+		firstWord = name.Substring(0,1).ToUpper() + name.Substring(1);
+		return  Prefix + ConvertToWord(firstWord);
+	}	
+	return Prefix + name;
+}
+
+//转换为Camel写法
+public string ConvertToCamel(string name)
+{
+	return Prefix + name.Substring(0,1).ToLower() + ConvertToWord(name.Substring(1).ToLower());	
+}
+
+//转换为Camel写法
+public string ConvertToCamel(string name,string firstName)
+{	
+	string firstWord = "";
+	string secondWord= "";
+	name = name.ToLower();
+	firstName =  firstName.ToLower();	
+	
+	if(name == firstName )
+	{
+		firstWord = name;
+		return Prefix + firstWord;
+	}
+	
+	if(name.IndexOf(firstName) != -1)
+	{
+		firstWord = firstName;
+		secondWord = name.Substring(firstName.Length,1).ToUpper() + name.Substring(firstName.Length + 1);
+		return Prefix + firstWord + secondWord;
+	}
+	
+	if(name != firstName)
+	{
+		firstWord = name;
+		return  Prefix + firstWord;
+	}	
+	return Prefix + name;	
+}
+
+//转换为方法里参数的写法
+public string ConvertToParameters(string name)
+{
+	return Prefix + name.Substring(0,1).ToLower() + ConvertToWord(name.Substring(1));
+}
+
+//去除字符中的转行
+public string ConvertToSwitch(string name)
+{
+	if(name.IndexOf("\n") != -1)
+	{
+		return name.Replace("\n","");
+	}
+	return name;
+}
+
+//根据词库转换为方法里参数的写法
+public string ConvertToWord(string name)
+{
+	name = name.Replace("add","Add").Replace("id","Id").Replace("name","Name").Replace("day","Day").Replace("enterprise","Enterprise")
+	.Replace("control","Control").Replace("group","Group").Replace("date","Date").Replace("word","Word")
+	.Replace("config","Config").Replace("area","Area").Replace("file","File").Replace("pass","Pass")
+	.Replace("source","Source").Replace("path","Path").Replace("delete","Delete")
+	.Replace("record","Record").Replace("user","User").Replace("right","Right")
+	.Replace("role","Role").Replace("desc","Desc").Replace("true","True").Replace("nick","Nick")
+	.Replace("department","Department").Replace("phone","Phone").Replace("sex","Sex").Replace("birth","Birth")
+	.Replace("Advertisement","Advertisement").Replace("picture","Picture").Replace("email","Email")
+	.Replace("lower","Lower").Replace("price","Price").Replace("default","Default").Replace("code","Code")
+	.Replace("page","Page").Replace("channel","Channel").Replace("type","Type").Replace("wIdth","WIdth")
+	.Replace("height","Height").Replace("cycle","Cycle").Replace("start","Start").Replace("enddate","EndDate")
+	.Replace("auction","Auction").Replace("person","Person").Replace("price","Price").Replace("verify","Verify")
+	.Replace("history","History").Replace("max","Max").Replace("category","Category").Replace("sort","Sort")
+	.Replace("carte","Carte").Replace("position","Position").Replace("company","Company")
+	.Replace("move","Move").Replace("web","Web").Replace("zId","ZId").Replace("fax","Fax")
+	.Replace("menu","Menu").Replace("content","Content").Replace("title","Title").Replace("pure","Pure")
+	.Replace("function","Function").Replace("small","Small").Replace("pic","Pic").Replace("big","Big")
+	.Replace("label","Label").Replace("model","Model").Replace("parameter","Parameter").Replace("value","Value")
+	.Replace("table","Table").Replace("current","Current").Replace("preview","Preview").Replace("style","Style")
+	.Replace("down","Down").Replace("length","Length").Replace("flash","Flash").Replace("swf","Swf")
+	.Replace("xml","Xml").Replace("function","Function").Replace("module","Module").Replace("has","Has")
+	.Replace("html","Html").Replace("leave","Leave").Replace("link","Link").Replace("url","Url")
+	.Replace("hIde","Hide").Replace("lock","Lock").Replace("level","Level").Replace("news","News")
+	.Replace("first","First").Replace("back","Back").Replace("product","Product").Replace("recruitment","Recruitment")
+	.Replace("location","Location").Replace("number","Number").Replace("period","Period").Replace("education","Education")
+	.Replace("responsibilities","Responsibilities").Replace("requirements","Requirements").Replace("recycling","Recycling")
+	.Replace("station","Station").Replace("sql","SQL").Replace("restoration","Restoration").Replace("reply","Reply")
+	.Replace("site","Site").Replace("key","Key").Replace("domain","Domain").Replace("second","Second")
+	.Replace("state","State").Replace("close","Close").Replace("vIdeo","Video").Replace("VIdeo","Video").Replace("collect","Collect")
+	.Replace("comment","Comment").Replace("Comment","Comment").Replace("buyer","Buyer").Replace("exh","Exh")
+	.Replace("logo","Logo").Replace("leAder","Leader").Replace("found","Found").Replace("history","History")
+	.Replace("culture","Culture").Replace("num","Num").Replace("affair","Affair").Replace("profession","Profession")
+	.Replace("bus","Bus").Replace("license","License").Replace("all","All").Replace("hAll","Hall").Replace("plan","Plan")
+	.Replace("cAd","Cad").Replace("hotel","Hotel").Replace("run","Run")
+	.Replace("step","Step").Replace("point","Point").Replace("stpoint","Stpoint")
+	.Replace("out","Out").Replace("building","Building").Replace("meeting","Meeting").Replace("room","Room")
+	.Replace("other","Other").Replace("busi","Busi").Replace("ware","Ware").Replace("house","House")
+	.Replace("ground","Ground").Replace("voltage","Voltage").Replace("power","Power").Replace("water","Water")
+	.Replace("supply","Supply").Replace("drainage","Drainage").Replace("gas","Gas").Replace("conditioner","Conditioner")
+	.Replace("communication","Communication").Replace("setup","Setup").Replace("newtch","Newtch").Replace("host","Host")
+	.Replace("apply","Apply").Replace("reject","Reject").Replace("cause","Cause").Replace("server","Server")
+	.Replace("detail","Detail").Replace("superiority","Superiority").Replace("scale","Scale").Replace("range","Range")
+	.Replace("service","Service").Replace("hand","Hand").Replace("book","Book").Replace("guest","Guest")
+	.Replace("series","Series").Replace("serieS","Series").Replace("item","Item").Replace("subject","Subject").Replace("Fbi","FBI").Replace("fbi","FBI")
+	.Replace("app","App").Replace("column","Column").Replace("favorite","Favorite").Replace("favorite","Favorite")
+	.Replace("format","Format").Replace("search","Search").Replace("object","Object").Replace("rule","Rule")
+	.Replace("alias","Alias").Replace("match","Match").Replace("standard","Standard").Replace("show","Show")
+	.Replace("focus","Focus").Replace("hit","Hit").Replace("sum","Sum").Replace("message","Message")
+	.Replace("frequency","Frequency").Replace("main","Main").Replace("loop","Loop").Replace("secd","Secd")
+	.Replace("generate","Generate").Replace("time","Time").Replace("err","Err").Replace("pack","Pack")
+	.Replace("ccnf","Ccnf").Replace("prev","Prev").Replace("css","Css")
+	.Replace("blog","Blog").Replace("per","Per").Replace("friend","Friend").Replace("remark","Remark")
+	.Replace("reprint","Reprint").Replace("photo","Photo").Replace("qualification","Qualification").Replace("marriage","Marriage")
+	.Replace("msn","MSN").Replace("qq","QQ").Replace("blood","Blood").Replace("town","Town")
+	.Replace("status","Status").Replace("login","Login").Replace("question","Question").Replace("answer","Answer")
+	.Replace("constellation","Constellation").Replace("unit","Unit").Replace("min","Min").Replace("AdMin","Admin")
+	.Replace("score","Score").Replace("ok","Ok").Replace("task","Task").Replace("edition","Edition")
+	.Replace("data","Data").Replace("virtual","Virtual").Replace("rmb","RMB").Replace("ScorebId","Scorebid")
+	.Replace("EntheldExh","EntHeldExh").Replace("Scorebid","ScoreBid").Replace("Taskr","TaskR").Replace("ModelPackr","ModelPackR")
+	.Replace("exaMine","Examine").Replace("ExaMine","Examine").Replace("base","Base").Replace("info","Info").Replace("option","Option")
+	.Replace("consult","Consult").Replace("dayone","DayOne").Replace("visit","Visit").Replace("isnotice","IsNotice").Replace("record","Record")
+	.Replace("album","Album").Replace("Iscover","IsCover").Replace("perlog","PerLog").Replace("lookRight","LookRight").Replace("manage","Manage")
+	.Replace("article","Article").Replace("Previous","Previous").Replace("two","Two").Replace("nav","Nav").Replace("version","Version").Replace("home","Home")
+	.Replace("send","Send").Replace("Perlog","PerLog").Replace("Pinyin","PinYin").Replace("Dayone","DayOne").Replace("HAll","Hall").Replace("weight","Weight")
+	.Replace("LoOkRight","LookRight").Replace("Isagree","IsAgree").Replace("SmAll","SmAll").Replace("Iscover","IsCover").Replace("ISExhibits","IsExhibits")
+	.Replace("LayOut","Layout").Replace("DefaultlayOut","DefaultLayout").Replace("SitelayOut","SiteLayout").Replace("Isenable","IsEnable").Replace("row","Row")
+	.Replace("ExhibitadMin","ExhibitAdmin").Replace("Iscms","IsCMS").Replace("msg","Msg")
+	;
+	return name;
+}
+</script>

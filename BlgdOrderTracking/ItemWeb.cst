@@ -1,0 +1,42 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="C#" ResponseEncoding="utf-8" Description="数据模型模板"  %>
+<%@ Register Name="Common" Template="Common.cst" MergeProperties="False" ExcludeProperties="" %>
+<%@ Property Name="DB" Type="SchemaExplorer.DatabaseSchema" Default="NGIG_II" Category="Data" Description="数据库对象" %>
+<%@ Property Name="Table" Type="SchemaExplorer.TableSchema" Default="" Optional="False" Category="Data" Description="数据表对象" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="FileName" Type="String" Default="d:\\a.cs" Optional="False" Category="内容" Description="输出的文件路径" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="OutputFile" Type="Boolean" Default="false" Optional="False" Category="内容" Description="是否输出到文件" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="NameSpace" Type="String" Default="BLGD.OrderTracking" Optional="False" Category="内容" Description="命名空间" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="Creater" Type="String" Default="jinchuanliang" Optional="False" Category="内容" Description="创建者" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.IO" %> 
+ 
+<%
+Common com = new Common();
+string newTableName = Table.Name.Remove(0,3);
+string prefix = "";
+%> 	 
+    <%for(int i = 0;i<Table.Columns.Count;i++)%>
+    <%{%> 
+        <div><label><%=Table.Columns[i].Description%><%=Table.Columns[i].Name%> : </label><span>@Model.<%=Table.Columns[i].Name%></span></div>
+    <%}%>  
+	
+       
+
+<script runat="template">
+///重写呈现方法，输出到文件
+public override void Render(TextWriter writer)
+{	
+	if(OutputFile)
+	{
+		StreamWriter sw = new StreamWriter(FileName,true);
+		this.Response.AddTextWriter(sw);
+		base.Render(writer);
+		sw.Close();
+	}		
+	else
+	{
+		base.Render(writer);
+	}	
+}
+</script>

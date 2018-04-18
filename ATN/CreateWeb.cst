@@ -1,0 +1,111 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="C#" ResponseEncoding="utf-8" Description="数据模型模板"  %>
+<%@ Register Name="Common" Template="Common.cst" MergeProperties="False" ExcludeProperties="" %>
+<%@ Property Name="DB" Type="SchemaExplorer.DatabaseSchema" Default="NGIG_II" Category="Data" Description="数据库对象" %>
+<%@ Property Name="Table" Type="SchemaExplorer.TableSchema" Default="" Optional="False" Category="Data" Description="数据表对象" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="FileName" Type="String" Default="d:\\a.cs" Optional="False" Category="内容" Description="输出的文件路径" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="OutputFile" Type="Boolean" Default="false" Optional="False" Category="内容" Description="是否输出到文件" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="NameSpace" Type="String" Default="Antonio" Optional="False" Category="内容" Description="命名空间" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="Creater" Type="String" Default="jinchuanliang" Optional="False" Category="内容" Description="创建者" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.IO" %> 
+ 
+<%
+Common com = new Common();
+string newTableName = Table.Name.Remove(0,3);
+string prefix = "";
+%>
+ 
+@{
+    ViewBag.Title = "Create";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+@section Styles {
+    @Styles.Render("~/Content/<%=newTableName%>/XXX.css")
+    @Styles.Render("~/Content/<%=newTableName%>/XXXX.css")
+}
+
+<div class="pri-content">
+<div class="add-public-number form-entirety">		 
+    <%for(int i = 0;i<Table.Columns.Count;i++)%>
+    <%{%> 
+        <div><label><%=Table.Columns[i].Description%><%=Table.Columns[i].Name%></label><span><input type="text" placeholder="<%=Table.Columns[i].Description%>" id="txt_<%=Table.Columns[i].Name%>" /></span></div>
+    <%}%>  
+	  <div><label></label><span><a class="btn-save">保存</a></span></div>
+</div>
+</div>
+
+<script type="text/javascript">
+    var id = '';
+    var imgBase64='';
+$(function () {
+   
+    $('.btn-save').click(function () {
+        sub();
+    });
+});
+
+function sub()
+{
+    var jsData = {};
+
+    <%for(int i = 0;i<Table.Columns.Count;i++)%>
+    <%{%> 
+        jsData.<%=Table.Columns[i].Name%> = $('#txt_<%=Table.Columns[i].Name%>').val().trim();
+    <%}%> 
+    
+     
+    <%for(int i = 0;i<Table.Columns.Count;i++)%>
+    <%{%> 
+        if (jsData.<%=Table.Columns[i].Name%>.length < 1) {
+            showErr("请输入<%=Table.Columns[i].Description%>");
+            return false;
+        } 
+    <%}%> 
+       
+    $.ajax({
+        type: "post",
+        dataType: "json",
+        data: {jsonData:JSON.stringify(jsData),action:'create'},
+        url: ESPWebDomain + '/<%=newTableName%>/ajax',
+        async: true,
+        success: function (objdata) {
+            if (objdata.returncode == '0') {
+                location.href = ESPWebDomain + '/<%=newTableName%>';
+            } else {
+                showErr(objdata.returnmsg);
+            }
+        },
+        error: function (e) {
+            alert(JSON.stringify(e));
+        }
+    });
+}
+function showErr(msg)
+{
+    alert(msg);
+}
+</script>
+@section Scripts { 
+    @Scripts.Render("~/scripts/<%=newTableName%>/XXX.js?v=2")
+}
+
+<script runat="template">
+///重写呈现方法，输出到文件
+public override void Render(TextWriter writer)
+{	
+	if(OutputFile)
+	{
+		StreamWriter sw = new StreamWriter(FileName,true);
+		this.Response.AddTextWriter(sw);
+		base.Render(writer);
+		sw.Close();
+	}		
+	else
+	{
+		base.Render(writer);
+	}	
+}
+</script>

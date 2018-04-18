@@ -1,0 +1,128 @@
+﻿<%@ CodeTemplate Language="C#" TargetLanguage="C#" ResponseEncoding="utf-8" Description="数据模型模板"  %>
+<%@ Register Name="Common" Template="Common.cst" MergeProperties="False" ExcludeProperties="" %>
+<%@ Property Name="DB" Type="SchemaExplorer.DatabaseSchema" Default="NGIG_II" Category="Data" Description="数据库对象" %>
+<%@ Property Name="Table" Type="SchemaExplorer.TableSchema" Default="" Optional="False" Category="Data" Description="数据表对象" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="FileName" Type="String" Default="d:\\a.cs" Optional="False" Category="内容" Description="输出的文件路径" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="OutputFile" Type="Boolean" Default="false" Optional="False" Category="内容" Description="是否输出到文件" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="NameSpace" Type="String" Default="ESP.Models" Optional="False" Category="内容" Description="命名空间" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Property Name="Creater" Type="String" Default="jinchuanliang" Optional="False" Category="内容" Description="创建者" OnChanged="" Editor="" EditorBase="" Serializer="" %>
+<%@ Assembly Name="SchemaExplorer" %>
+<%@ Import Namespace="SchemaExplorer" %>
+<%@ Assembly Name="System.Data" %>
+<%@ Import Namespace="System.IO" %> 
+ 
+<%
+Common com = new Common();
+string newTableName = Table.Name.Remove(0,3);
+string prefix = "";
+%>
+/*----------------------------------------------------------------
+// Copyright (C) 2014 广州玖门安防智能科技有限公司 版权所有。 
+//
+// 文件名：<%= prefix + newTableName%>
+// 文件功能描述：<%=Table.Description%>
+//
+// 创建标识：<%=Creater%> <%=DateTime.Now.ToString("yyyy-MM-dd")%>
+//
+// 修改标识：
+// 修改描述：
+//----------------------------------------------------------------*/
+using System;
+using System.Data;
+using System.Collections.Generic;
+using CCNF.Framework.Entity;
+using Newtonsoft.Json;
+
+namespace <%=NameSpace%>
+{
+    /// <summary>
+    /// <%=Table.Description%>
+    /// [<%=Table.Name%>]数据模型
+    /// </summary>
+	/// <author><%=Creater%> <%=DateTime.Now.ToString("yyyy-MM-dd")%></author>
+    [Table("<%=Table.Name%>")]
+    public class <%=prefix + newTableName%>
+    {
+		/// <summary>
+    	/// 初始化默认值构造函数
+    	/// </summary>
+		/// <author><%=Creater%> <%=DateTime.Now.ToString("yyyy-MM-dd")%></author>
+		public <%=prefix + newTableName%>()
+		{
+       	<%for(int i = 0;i<Table.Columns.Count;i++)%>
+		<%{%>
+			<%=Table.Columns[i].Name%> = <%=com.SetDataTypeDefaultValue(Table.Columns[i].DataType)%>;
+		<%}%>
+		}
+		
+		#region [<%=Table.Name%>]表字段属性
+		
+		<%for(int i = 0;i<Table.Columns.Count;i++)%>
+		<%{%>
+		
+		/// <summary>
+		/// <%=Table.Columns[i].Description%>
+		/// </summary>        
+        [JsonProperty(PropertyName = "<%=Table.Columns[i].Name.ToLower()%>")]
+		[Column("<%=Table.Columns[i].Name%>", DbType.<%=Table.Columns[i].DataType%><%=Table.Columns[i].Name == Table.PrimaryKey.MemberColumns[0].Name?", isPrimarykey: true":""%>)]
+		public <%=com.GetCSharpDataType(Table.Columns[i])%> <%=Table.Columns[i].Name%>
+		{
+			set; 
+			get;
+		}
+		
+		<%}%>
+		#endregion
+    }
+	
+	/// <summary>
+    /// [<%=Table.Name%>]表列的的参数
+    /// </summary>
+    public struct P<%=prefix + Table.Name.Remove(0,3)%>
+    {
+		#region [<%=Table.Name%>]表列的参数
+		
+		 <%for(int i=0;i<Table.Columns.Count;i++){%>
+		/// <summary>
+        /// <%=Table.Columns[i].Description%>
+        /// </summary>
+		public const string <%=Table.Columns[i].Name,Table.Name.Remove(0,3)%> = "<%=Table.Columns[i].Name,Table.Name.Remove(0,3)%>";
+		
+		<%}%> 
+		
+		/// <summary>
+        /// [<%=com.ConvertToCamel(Table.Name)%>]表所有字段名的字符串数组
+        /// </summary>
+		public static List<string> AllProperty 
+		{
+			get{
+                 List<string> list = new List<string>();
+                <%for(int i=0;i<Table.Columns.Count;i++)%>
+                <%{%>
+                 list.Add(<%=Table.Columns[i].Name%>);                 
+                <%}%> 
+                return list; 
+    		}
+    		
+    		#endregion
+    	}
+    }
+}
+
+<script runat="template">
+///重写呈现方法，输出到文件
+public override void Render(TextWriter writer)
+{	
+	if(OutputFile)
+	{
+		StreamWriter sw = new StreamWriter(FileName,true);
+		this.Response.AddTextWriter(sw);
+		base.Render(writer);
+		sw.Close();
+	}		
+	else
+	{
+		base.Render(writer);
+	}	
+}
+</script>
